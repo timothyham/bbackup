@@ -38,6 +38,7 @@ func NewDecryptReadSeeker(key string, backingRs io.ReadSeeker) (io.ReadSeeker, e
 	seeker.cipherBytes = make([]byte, ChunkSize+seeker.enc.Overhead)
 	seeker.plainBytes = make([]byte, ChunkSize)
 	seeker.tmpByte = make([]byte, 1)
+	seeker.cursorChunk = -1
 
 	return &seeker, nil
 }
