@@ -1,0 +1,39 @@
++ Authenticated Encryption using xchacha20poly1305
++ Metadata for encrypted files
+- database for configuration and metadata
+
++ metadata
+  - original file name
+  - original perm digits
+  - original username/id
+
+  - encrypted file name
+  - original sha1
+  - original sha256
+  - encryped sha1
+  - encrypted sha256
+
+- backup book keeping
+
+- ui to browse backup metadata
+- download/extract from backup
+
+
+- backup workflow
+
+  - create and initialize the db in the directory if not exist
+    - collect master passphrase, encrypt using argon2
+  - walk the path
+    - if file exist in db
+      - check size and modtime. If different update
+    - if file doesn't exist in the db
+      - add to db and update
+  - update:
+    - encrypt the file
+    - upload to destination
+    - on success, write metadata to db
+  - prune:
+    - iterate over all the files in the database
+    - if file exists on disk, skip
+    - if file is missing, delete in destination
+    - delete in db
