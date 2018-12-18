@@ -8,7 +8,7 @@ import (
 )
 
 // generate one meg text file with internal markers start/end
-func TestGenerate1MiBText(t *testing.T) {
+func testGenerate1MiBText(t *testing.T) {
 	run := false
 	if run == false {
 		return

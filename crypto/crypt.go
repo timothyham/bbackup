@@ -310,46 +310,6 @@ func (e *Encryptor) DecryptChunk(plainBytes, cipherBytes []byte) ([]byte, error)
 	return outBytes, err
 }
 
-// ReadWrite returns the number of bytes processed, the write sha256, and read sha256, and error
-func (e *Encryptor) ReadWrite(w io.Writer, r io.Reader) (int, string, string, error) {
-	bufsize := 1024 * 128 // 128KB
-	in := make([]byte, bufsize)
-	out := make([]byte, bufsize)
-
-	insha256 := sha256.New()
-	outsha256 := sha256.New()
-
-	stop := false
-	sumn := 0
-	for !stop {
-		n, err := r.Read(in)
-		if n < bufsize {
-			if err == io.EOF {
-				stop = true
-			} else if err != nil {
-				return sumn, "", "", err
-			}
-		}
-		insha256.Write(in[:n])
-		outsha256.Write(out[:n])
-		m, err := w.Write(out[:n])
-		if m != n {
-			return sumn, "", "", errors.New("Write error")
-		}
-		if stop {
-			return sumn, BytesToString(outsha256.Sum(nil)), BytesToString(insha256.Sum(nil)), err
-		}
-
-		sumn += n
-	}
-
-	return sumn, BytesToString(outsha256.Sum(nil)), BytesToString(insha256.Sum(nil)), nil
-}
-
-func BytesToString(b []byte) string {
-	return fmt.Sprintf("%x", b)
-}
-
 // NewEncname generates a random 200 bit number and returns the base32 string
 func NewEncname() string {
 	newkey := make([]byte, 200/8)
