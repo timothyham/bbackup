@@ -17,9 +17,10 @@ type DecryptReadSeeker struct {
 	cursorChunk int64 // when cursorChunk == -1, chunk is not ready
 	eof         bool
 	tmpByte     []byte
+	size        int64
 }
 
-func NewDecryptReadSeeker(key string, backingRs io.ReadSeeker) (io.ReadSeeker, error) {
+func NewDecryptReadSeeker(key string, size int64, backingRs io.ReadSeeker) (io.ReadSeeker, error) {
 	header := make([]byte, headerOffset)
 	n, err := backingRs.Read(header)
 	if err != nil || n != headerOffset {
@@ -38,6 +39,7 @@ func NewDecryptReadSeeker(key string, backingRs io.ReadSeeker) (io.ReadSeeker, e
 	seeker.cipherBytes = make([]byte, ChunkSize+seeker.enc.Overhead)
 	seeker.plainBytes = make([]byte, ChunkSize)
 	seeker.tmpByte = make([]byte, 1)
+	seeker.size = size
 	seeker.cursorChunk = -1
 
 	return &seeker, nil
@@ -129,8 +131,18 @@ func (seeker *DecryptReadSeeker) Read(b []byte) (int, error) {
 	Only 0 whence is supported
 */
 func (seeker *DecryptReadSeeker) Seek(offset int64, whence int) (int64, error) {
+	switch whence {
+	case io.SeekCurrent:
+		offset = seeker.cursor + offset
+	case io.SeekEnd:
+		offset = seeker.size - offset
+	default: // aka io.SeekStart (0)
+
+	}
 	if offset < 0 {
-		return 0, errors.New("cannot seek negative offset")
+		offset = 0
+	} else if offset > seeker.size {
+		offset = seeker.size
 	}
 	seeker.pendingSeek = offset
 	seeker.eof = false

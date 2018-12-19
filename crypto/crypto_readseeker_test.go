@@ -56,7 +56,7 @@ func TestReadSeeker(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 	lenFile := pInfo.Size()
-	dec, err := NewDecryptReadSeeker(key, f)
+	dec, err := NewDecryptReadSeeker(key, lenFile, f)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
@@ -146,7 +146,10 @@ func TestReadWhole(t *testing.T) {
 	if err != nil {
 		t.Fatal("Couldn't open test file")
 	}
-
+	st, err := plainf.Stat()
+	if err != nil {
+		t.Fatal("could not get stat for plainfile")
+	}
 	encfile := "testdata/big_buck_bunny.enc"
 
 	key := "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f"
@@ -156,7 +159,7 @@ func TestReadWhole(t *testing.T) {
 		t.Fatal("Couldn't open test file")
 	}
 
-	dec, err := NewDecryptReadSeeker(key, f)
+	dec, err := NewDecryptReadSeeker(key, st.Size(), f)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
