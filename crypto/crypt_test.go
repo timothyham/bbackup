@@ -1,6 +1,8 @@
 package crypto
 
 import (
+	"encoding/base64"
+	"encoding/hex"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -20,8 +22,15 @@ func TestEncryptDecrypt(t *testing.T) {
 	}
 
 	encryptor := NewEncryptor()
-	encryptor.SetKey("000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f")
-	encryptor.SetIv("000102030405060708090a0b0c0d0e0f0001020304050607")
+	keyHex := "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f"
+	key, _ := hex.DecodeString(keyHex)
+	keyB64 := base64.RawURLEncoding.EncodeToString(key)
+	encryptor.SetKey(keyB64)
+
+	ivHex := "000102030405060708090a0b0c0d0e0f0001020304050607"
+	iv, _ := hex.DecodeString(ivHex)
+	ivB64 := base64.RawURLEncoding.EncodeToString(iv)
+	encryptor.SetIv(ivB64)
 	encryptor.Init()
 
 	hash, err := encryptor.Encrypt(ciphertext, plaintext, true)

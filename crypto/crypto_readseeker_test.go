@@ -2,6 +2,8 @@ package crypto
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"math/rand"
@@ -44,7 +46,9 @@ func TestReadSeeker(t *testing.T) {
 
 	encfile := "testdata/big_buck_bunny.enc"
 
-	key := "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f"
+	keyHex := "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f"
+	key, _ := hex.DecodeString(keyHex)
+	keyB64 := base64.RawURLEncoding.EncodeToString(key)
 	f, err := os.Open(encfile)
 	defer f.Close()
 	if err != nil {
@@ -56,7 +60,7 @@ func TestReadSeeker(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 	lenFile := pInfo.Size()
-	dec, err := NewDecryptReadSeeker(key, lenFile, f)
+	dec, err := NewDecryptReadSeeker(keyB64, lenFile, f)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
@@ -152,14 +156,17 @@ func TestReadWhole(t *testing.T) {
 	}
 	encfile := "testdata/big_buck_bunny.enc"
 
-	key := "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f"
+	keyHex := "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f"
+	key, _ := hex.DecodeString(keyHex)
+	keyB64 := base64.RawURLEncoding.EncodeToString(key)
+	fmt.Printf("xxx: '%s'\n", keyB64)
 	f, err := os.Open(encfile)
 	defer f.Close()
 	if err != nil {
 		t.Fatal("Couldn't open test file")
 	}
 
-	dec, err := NewDecryptReadSeeker(key, st.Size(), f)
+	dec, err := NewDecryptReadSeeker(keyB64, st.Size(), f)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}

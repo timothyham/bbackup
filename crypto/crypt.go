@@ -6,8 +6,8 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base32"
+	"encoding/base64"
 	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -88,11 +88,11 @@ func NewEncryptor() *Encryptor {
 func NewDecryptor(key, iv string) *Encryptor {
 	e := Encryptor{}
 	var err error
-	e.key, err = hex.DecodeString(key)
+	e.key, err = base64.RawURLEncoding.DecodeString(key)
 	if err != nil {
 		panic(err)
 	}
-	e.iv, err = hex.DecodeString(iv)
+	e.iv, err = base64.RawURLEncoding.DecodeString(iv)
 	if err != nil {
 		panic(err)
 	}
@@ -101,22 +101,22 @@ func NewDecryptor(key, iv string) *Encryptor {
 	return &e
 }
 func (e *Encryptor) GetKey() string {
-	return fmt.Sprintf("%x", e.key)
+	return fmt.Sprintf("%s", base64.RawURLEncoding.EncodeToString(e.key))
 }
 
 func (e *Encryptor) GetIv() string {
-	return fmt.Sprintf("%x", e.iv)
+	return fmt.Sprintf("%x", base64.RawURLEncoding.EncodeToString(e.iv))
 }
 
 func (e *Encryptor) SetKey(key string) {
-	k, err := hex.DecodeString(key)
+	k, err := base64.RawURLEncoding.DecodeString(key)
 	if err == nil {
 		e.key = k
 	}
 }
 
 func (e *Encryptor) SetIv(iv string) {
-	i, err := hex.DecodeString(iv)
+	i, err := base64.RawURLEncoding.DecodeString(iv)
 	if err == nil {
 		e.iv = i
 	}
