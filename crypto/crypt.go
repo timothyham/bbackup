@@ -105,7 +105,7 @@ func (e *Encryptor) GetKey() string {
 }
 
 func (e *Encryptor) GetIv() string {
-	return fmt.Sprintf("%x", base64.RawURLEncoding.EncodeToString(e.iv))
+	return fmt.Sprintf("%s", base64.RawURLEncoding.EncodeToString(e.iv))
 }
 
 func (e *Encryptor) SetKey(key string) {

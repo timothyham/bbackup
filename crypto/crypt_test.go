@@ -33,6 +33,13 @@ func TestEncryptDecrypt(t *testing.T) {
 	encryptor.SetIv(ivB64)
 	encryptor.Init()
 
+	if ivB64 != encryptor.GetIv() {
+		t.Error("Error getting IV")
+	}
+	if keyB64 != encryptor.GetKey() {
+		t.Error("error getting key")
+	}
+
 	hash, err := encryptor.Encrypt(ciphertext, plaintext, true)
 	if err != nil {
 		t.Errorf("Error encrypting file: %v", err)
